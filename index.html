@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gothic Dark Wave 80s Player</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Efeito de scan lines retrô */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Efeito de glitch de fundo */
+        @keyframes glitch-bg {
+            0%, 100% { background-position: 0 0; }
+            50% { background-position: 2px 2px; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .title {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ff00ff;
+            text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #ff00ff;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #ff00ff;
+            }
+            50% {
+                text-shadow: 0 0 30px #ff00ff, 0 0 60px #ff00ff, 0 0 90px #ff00ff;
+            }
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            letter-spacing: 2px;
+        }
+
+        .player-container {
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #ff00ff;
+            border-radius: 10px;
+            padding: 30px;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.5), inset 0 0 20px rgba(0, 255, 255, 0.1);
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .song-info {
+            background: rgba(255, 0, 255, 0.1);
+            border: 2px solid #ff00ff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .song-title {
+            font-size: 1.5em;
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .song-artist {
+            font-size: 1em;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 255, 255, 0.2);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid #00ffff;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff00ff, #00ffff);
+            width: 0%;
+            box-shadow: 0 0 10px #ff00ff;
+            transition: width 0.1s linear;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff00ff, #00ffff);
+            border: 2px solid #ff00ff;
+            color: #000;
+            padding: 12px 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.8), 0 0 40px rgba(0, 255, 255, 0.5);
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-special {
+            background: linear-gradient(135deg, #ff00ff, #ff0080);
+            border: 3px solid #ff00ff;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+            animation: pulse-button 1.5s infinite;
+        }
+
+        @keyframes pulse-button {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 0, 255, 1), 0 0 40px rgba(0, 255, 255, 0.5);
+            }
+        }
+
+        .playlist {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #00ffff;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .playlist-title {
+            color: #00ffff;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .playlist-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: rgba(255, 0, 255, 0.1);
+            border-left: 3px solid #ff00ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+            color: #e0e0e0;
+        }
+
+        .playlist-item:hover {
+            background: rgba(255, 0, 255, 0.3);
+            transform: translateX(5px);
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+        }
+
+        .playlist-item.active {
+            background: rgba(255, 0, 255, 0.5);
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+        }
+
+        /* Scrollbar customizado */
+        .playlist::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .playlist::-webkit-scrollbar-track {
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .playlist::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #ff00ff, #00ffff);
+            border-radius: 4px;
+        }
+
+        .playlist::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #ff00ff, #00ffff);
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
+        }
+
+        /* Efeito visual dinâmico */
+        .visual-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .visual-bar {
+            position: absolute;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #ff00ff, #00ffff);
+            opacity: 0.3;
+            animation: rise 0.6s ease-out forwards;
+        }
+
+        @keyframes rise {
+            from {
+                height: 0;
+                opacity: 0.5;
+            }
+            to {
+                height: 100%;
+                opacity: 0;
+            }
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2em;
+            }
+
+            .player-container {
+                padding: 20px;
+            }
+
+            .controls {
+                gap: 10px;
+            }
+
+            .btn {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+        }
+
+        .time-display {
+            text-align: center;
+            color: #00ffff;
+            font-size: 0.9em;
+            margin-top: 10px;
+            text-shadow: 0 0 5px #00ffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="visual-effect" id="visualEffect"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="title">⚰️ GOTHIC DARK WAVE ⚰️</h1>
+            <p class="subtitle">80s PLAYER - ETERNAL NIGHT</p>
+        </div>
+
+        <div class="player-container">
+            <div class="video-container">
+                <iframe id="youtubePlayer" 
+                    src="" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+
+            <div class="song-info">
+                <div class="song-title" id="songTitle">Selecione uma música</div>
+                <div class="song-artist" id="songArtist">Gothic Dark Wave Collection</div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="time-display">
+                <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="previousSong()">⏮️ ANTERIOR</button>
+                <button class="btn" onclick="togglePlay()" id="playBtn">▶️ PLAY</button>
+                <button class="btn" onclick="nextSong()">PRÓXIMO ⏭️</button>
+                <button class="btn" onclick="stopPlayback()">⏹️ PARAR</button>
+                <button class="btn btn-special" onclick="playAll()">🎵 TOCAR TODAS 🎵</button>
+            </div>
+
+            <div class="playlist">
+                <div class="playlist-title">🎸 Playlist (30 Músicas)</div>
+                <div id="playlistContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lista de 30 músicas góticas dark wave
+        const songs = [
+            { id: 'HeCgOiirV4', title: 'Música 1', artist: 'Gothic Dark Wave' },
+            { id: 'tBpQ1f77PDA', title: 'Música 2', artist: 'Gothic Dark Wave' },
+            { id: 'h4Jnv-pb6sk', title: 'Música 3', artist: 'Gothic Dark Wave' },
+            { id: 'A_ZJnKoMoBA', title: 'Música 4', artist: 'Gothic Dark Wave' },
+            { id: '9CvpeDHgCpo', title: 'Música 5', artist: 'Gothic Dark Wave' },
+            { id: 'LHUz8vA_wCM', title: 'Música 6', artist: 'Gothic Dark Wave' },
+            { id: 'bIGoN8_vv_Y', title: 'Música 7', artist: 'Gothic Dark Wave' },
+            { id: 'npQwX2X3WBE', title: 'Música 8', artist: 'Gothic Dark Wave' },
+            { id: 'qLQ0PZ-Zwc8', title: 'Música 9', artist: 'Gothic Dark Wave' },
+            { id: 'bjxfcGJM3V4', title: 'Música 10', artist: 'Gothic Dark Wave' },
+            { id: 'DOzdBjtA9H0', title: 'Música 11', artist: 'Gothic Dark Wave' },
+            { id: 'qFtiH1bZuJ0', title: 'Música 12', artist: 'Gothic Dark Wave' },
+            { id: 'FaHMRB30HmA', title: 'Música 13', artist: 'Gothic Dark Wave' },
+            { id: 'VdAlPCrndT8', title: 'Música 14', artist: 'Gothic Dark Wave' },
+            { id: 'gebchYvcp2s', title: 'Música 15', artist: 'Gothic Dark Wave' },
+            { id: '77GxLUUEcHo', title: 'Música 16', artist: 'Gothic Dark Wave' },
+            { id: 'bYM8iPn47yE', title: 'Música 17', artist: 'Gothic Dark Wave' },
+            { id: 'bpxKOOUhLs8', title: 'Música 18', artist: 'Gothic Dark Wave' },
+            { id: 'y0AaKrZLFQo', title: 'Música 19', artist: 'Gothic Dark Wave' },
+            { id: 'LVQi3iyx_Hc', title: 'Música 20', artist: 'Gothic Dark Wave' },
+            { id: 'ElcwzDwdYkA', title: 'Música 21', artist: 'Gothic Dark Wave' },
+            { id: 'F3VwhAe7Ks0', title: 'Música 22', artist: 'Gothic Dark Wave' },
+            { id: 'mwooX2qXrwE', title: 'Música 23', artist: 'Gothic Dark Wave' },
+            { id: 'lAt6qFZby5w', title: 'Música 24', artist: 'Gothic Dark Wave' },
+            { id: 'Wj1r0bU3pkg', title: 'Música 25', artist: 'Gothic Dark Wave' },
+            { id: '5zS9CbU1gxY', title: 'Música 26', artist: 'Gothic Dark Wave' },
+            { id: 'pO4lvJUwrwk', title: 'Música 27', artist: 'Gothic Dark Wave' },
+            { id: 'X8wAX8uZHi8', title: 'Música 28', artist: 'Gothic Dark Wave' },
+            { id: '4AcNJQYb0Rw', title: 'Música 29', artist: 'Gothic Dark Wave' },
+            { id: '6170iawsQHE', title: 'Música 30', artist: 'Gothic Dark Wave' }
+        ];
+
+        let currentIndex = 0;
+        let isPlaying = false;
+        let playingAll = false;
+        let player = null;
+
+        // Cores para efeito visual
+        const colors = ['#ff00ff', '#00ffff', '#ff0080', '#00ff80', '#ff00ff'];
+        let colorIndex = 0;
+
+        // Inicializar
+        function init() {
+            renderPlaylist();
+            loadSong(0);
+            createYouTubePlayer();
+        }
+
+        // Criar player do YouTube
+        function createYouTubePlayer() {
+            const iframe = document.getElementById('youtubePlayer');
+            loadSong(0);
+        }
+
+        // Carregar música
+        function loadSong(index) {
+            if (index < 0 || index >= songs.length) return;
+            
+            currentIndex = index;
+            const song = songs[index];
+            
+            // Atualizar iframe
+            const iframe = document.getElementById('youtubePlayer');
+            iframe.src = `https://www.youtube.com/embed/${song.id}?enablejsapi=1&controls=0&modestbranding=1`;
+            
+            // Atualizar informações
+            document.getElementById('songTitle').textContent = song.title;
+            document.getElementById('songArtist').textContent = song.artist;
+            
+            // Atualizar playlist
+            updatePlaylistUI();
+            
+            // Efeito visual
+            changeVisualEffect();
+        }
+
+        // Tocar/Pausar
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            const btn = document.getElementById('playBtn');
+            btn.textContent = isPlaying ? '⏸️ PAUSAR' : '▶️ PLAY';
+            
+            if (isPlaying) {
+                // Simular reprodução
+                simulatePlayback();
+            }
+        }
+
+        // Parar reprodução
+        function stopPlayback() {
+            isPlaying = false;
+            playingAll = false;
+            document.getElementById('playBtn').textContent = '▶️ PLAY';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('currentTime').textContent = '0:00';
+        }
+
+        // Próxima música
+        function nextSong() {
+            if (currentIndex < songs.length - 1) {
+                loadSong(currentIndex + 1);
+                if (playingAll || isPlaying) {
+                    isPlaying = true;
+                    simulatePlayback();
+                }
+            } else if (playingAll) {
+                stopPlayback();
+            }
+        }
+
+        // Música anterior
+        function previousSong() {
+            if (currentIndex > 0) {
+                loadSong(currentIndex - 1);
+                if (playingAll || isPlaying) {
+                    isPlaying = true;
+                    simulatePlayback();
+                }
+            }
+        }
+
+        // Tocar todas as músicas
+        function playAll() {
+            playingAll = true;
+            isPlaying = true;
+            document.getElementById('playBtn').textContent = '⏸️ PAUSAR';
+            loadSong(0);
+            simulatePlayback();
+        }
+
+        // Simular reprodução e progresso
+        function simulatePlayback() {
+            let progress = 0;
+            const duration = Math.random() * 120 + 180; // 3-5 minutos
+            
+            const interval = setInterval(() => {
+                if (!isPlaying) {
+                    clearInterval(interval);
+                    return;
+                }
+                
+                progress += 0.5;
+                const percent = (progress / duration) * 100;
+                
+                document.getElementById('progressFill').style.width = percent + '%';
+                document.getElementById('currentTime').textContent = formatTime(progress);
+                document.getElementById('duration').textContent = formatTime(duration);
+                
+                if (progress >= duration) {
+                    clearInterval(interval);
+                    if (playingAll) {
+                        nextSong();
+                    } else {
+                        stopPlayback();
+                    }
+                }
+            }, 500);
+        }
+
+        // Formatar tempo
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Renderizar playlist
+        function renderPlaylist() {
+            const container = document.getElementById('playlistContainer');
+            container.innerHTML = '';
+            
+            songs.forEach((song, index) => {
+                const item = document.createElement('div');
+                item.className = 'playlist-item' + (index === 0 ? ' active' : '');
+                item.textContent = `${index + 1}. ${song.title}`;
+                item.onclick = () => {
+                    loadSong(index);
+                    isPlaying = true;
+                    document.getElementById('playBtn').textContent = '⏸️ PAUSAR';
+                    simulatePlayback();
+                };
+                container.appendChild(item);
+            });
+        }
+
+        // Atualizar UI da playlist
+        function updatePlaylistUI() {
+            const items = document.querySelectorAll('.playlist-item');
+            items.forEach((item, index) => {
+                item.classList.toggle('active', index === currentIndex);
+            });
+        }
+
+        // Efeito visual dinâmico
+        function changeVisualEffect() {
+            colorIndex = (colorIndex + 1) % colors.length;
+            const effect = document.getElementById('visualEffect');
+            
+            // Criar barras visuais
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const bar = document.createElement('div');
+                    bar.className = 'visual-bar';
+                    bar.style.left = Math.random() * 100 + '%';
+                    bar.style.background = `linear-gradient(180deg, ${colors[colorIndex]}, ${colors[(colorIndex + 1) % colors.length]})`;
+                    effect.appendChild(bar);
+                    
+                    setTimeout(() => bar.remove(), 600);
+                }, i * 100);
+            }
+        }
+
+        // Iniciar quando carregar
+        window.addEventListener('load', init);
+
+        // Detectar quando música termina (simulado)
+        setInterval(() => {
+            if (playingAll && isPlaying) {
+                const progress = parseFloat(document.getElementById('progressFill').style.width);
+                if (progress >= 99) {
+                    nextSong();
+                }
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
